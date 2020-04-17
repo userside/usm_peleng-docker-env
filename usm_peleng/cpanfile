@@ -1,0 +1,4 @@
+requires 'LWP::UserAgent';
+requires 'JSON';
+requires 'Net::Telnet';
+requires 'Net::SNMP';

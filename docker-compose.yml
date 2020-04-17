@@ -1,0 +1,13 @@
+version: '3.2'
+
+services:
+
+  usm_peleng:
+    build:
+      context: ./usm_peleng
+    volumes:
+      - ./usm_peleng/module:/app
+      - ./usm_peleng/log:/var/log/userside/usm_peleng/logs/
+    # Remove two lines below if used standalone container without userside bundle
+    networks:
+      - internal
