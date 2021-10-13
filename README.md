@@ -1,24 +1,81 @@
 # USM_PELENG Docker Environment
 
-This environment provides the feature of running the usm_peleng module inside the Docker container. This environment does not contain the module itself. You should download it additionally in your account and copy it inside the environment as described below.
+This environment provides the feature of running the usm_peleng module inside the Docker container. This environment **does not contain** the module itself. You should download it additionally in your account and copy it inside the environment as described below.
 
-1. Copy usm_peleng folder from this folder to userside bundle folder
-2. Add service setup from docker-compose.yml to bundle docker-composer.yml
-3. Download usm_peleng from https://my.userside.eu and unzip two files (usm_peleng.pl and usm_peleng.conf-example) into the usm_peleng/module folder.
-4. Rename usm_peleng.conf-example to usm_peleng.conf and setup parameters: `$usUrl = "http://nginx";` and `$usApiKey`. **Do not** modify parameter `$logsPath`! Setup other optional parameters, if needed.
-5. Copy usm_peleng.cron to host folder `/etc/cron.d` and change path to bundle (or your standalone) docker-compose.yml
-6. Build docker-image for service usm_peleng
-```
-docker-compose build
-```
+1. Download last version of docker-environment to your server from https://github.com/userside/usm_peleng-docker-env/releases
+2. Unzip downloaded archive to folder `usm_peleng-docker-env` and copy `usm_peleng` folder from unzipped folder into **userside bundle** folder. You should get approximately the following bundle file structure:
+  ```
+  /docker
+   └── userside
+        ├── config
+        ├── data
+        ├── usm_peleng
+        │    ├── log
+        │    ├── module
+        │    │    └── usm_peleng.conf
+        │    ├── cpanfile
+        │    └── Dockerfile
+        ├── docker-compose.yml
+        ├── init.sh
+        ├── Makefile
+        └── README.md
+  ```
+3. From `usm_peleng-docker-env/docker-composer.yml` copy the whole service config `usm_peleng:...` to service block into your docker-compose.yml. **Pay attention to the formatting!** The indents in the yaml file are very important.
+  ```yaml
+  services:
+    postgres:
+      ...
+    
+    fpm:
+      ...
+    
+    ...(other services)...
 
-## Test
+    usm_peleng:
+      build:
+        context: ${USERSIDE_BASE_DIR}/usm_peleng
+      environments:
+        USERSIDE_API_KEY: 'api-secret-key'
+      volumes:
+        - ${USERSIDE_BASE_DIR}/usm_peleng/module:/app
+        - ${USERSIDE_BASE_DIR}/usm_peleng/log:/var/log/usm_peleng
+        - /etc/localtime:/etc/localtime:ro
+        - /etc/timezone:/etc/timezone:ro
+      networks:
+        - internal
 
-To test the module, run it manually.
-```
-docker-compose run --rm usm_peleng perl usm_peleng.pl
-```
+  volumes:
+    ...
+  ```
+4. Setup environments.
+5. Download **usm_peleng** module from https://my.userside.eu/, extract and copy **only one file** `usm_peleng.pl` to the subdirectory `usm_peleng/module` folder. It should turn out as follows:
+  ```
+  /docker
+   └── userside
+        ├── config
+        ├── data
+        ├── usm_peleng
+        │    ├── log
+        │    ├── module
+        │    │    ├── usm_peleng.conf
+        │    │    └── usm_peleng.pl
+        │    ├── cpanfile
+        │    └── Dockerfile
+  ```
+6. Go to folder `/docker/userside` then build docker-image for service usm_peleng. It can take a long time, but it only needs to be done once.
+  ```bash
+  sudo docker-compose build usm_peleng
+  ```
+8. Make a test run:
+  ```bash
+  sudo docker-compose run --rm usm_peleng
+  ```
 
-## Any questions?
+9. Add a line to your /etc/cron.d/userside similar to the others. For example:
+  ```
+  * * * * *    root    /usr/local/bin/docker-compose .... run --rm usm_peleng > /dev/null
+  ```
+
+### Any questions?
 
 All questions are accepted only through the ticket system of your account.

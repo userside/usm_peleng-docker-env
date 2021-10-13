@@ -1,13 +1,17 @@
-version: '3.2'
-
 services:
 
   usm_peleng:
     build:
-      context: ./usm_peleng
+      context: ${USERSIDE_BASE_DIR}/usm_peleng
+    environments:
+      USERSIDE_API_KEY: 'api-secret-key'
+      # DELAY_BEFORE: 0
+      # CITIES_LIST: ''
+      # IS_ARP_POLLING: 0
     volumes:
-      - ./usm_peleng/module:/app
-      - ./usm_peleng/log:/var/log/userside/usm_peleng/logs/
-    # Remove two lines below if used standalone container without userside bundle
+      - ${USERSIDE_BASE_DIR}/usm_peleng/module:/app
+      - ${USERSIDE_BASE_DIR}/usm_peleng/log:/var/log/usm_peleng
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - internal

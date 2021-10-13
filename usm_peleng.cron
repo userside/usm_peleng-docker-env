@@ -1,1 +1,0 @@
-* * * * *    root    docker-compose -f /path/to/userside/docker-compose.yml run --rm usm_peleng perl usm_peleng.pl &> /dev/null
